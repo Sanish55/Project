@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaGuard AI - Smart Water Stewardship</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(0, 212, 170, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #00d4aa;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+
+        .header p {
+            color: #a0c4c7;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .sdg-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #009EDB, #00d4aa);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            border: 2px solid rgba(0, 212, 170, 0.3);
+            background: rgba(255,255,255,0.05);
+            color: #a0c4c7;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 212, 170, 0.15);
+            border-color: #00d4aa;
+            color: #00d4aa;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #00d4aa, #009EDB);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Content Panels */
+        .panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #00d4aa, #009EDB);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+        }
+
+        .chat-header-info h3 {
+            font-size: 1.1em;
+        }
+
+        .chat-header-info p {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 0.95em;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #00d4aa, #009EDB);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.bot .source {
+            font-size: 0.75em;
+            color: #00d4aa;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .message.bot .action-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 14px;
+            background: rgba(0, 212, 170, 0.2);
+            border: 1px solid #00d4aa;
+            border-radius: 15px;
+            color: #00d4aa;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .message.bot .action-btn:hover {
+            background: #00d4aa;
+            color: #1a1a2e;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00d4aa;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-area {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid rgba(0, 212, 170, 0.3);
+            background: rgba(255,255,255,0.08);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 0.95em;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #00d4aa;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.2);
+        }
+
+        .chat-input::placeholder {
+            color: #6a6a8a;
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4aa, #009EDB);
+            border: none;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 20px;
+            color: #00d4aa;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(0, 212, 170, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d4aa;
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.1);
+        }
+
+        .metric-card .label {
+            color: #a0c4c7;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .metric-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+
+        .metric-card .trend {
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .trend.up { color: #e74c3c; }
+        .trend.down { color: #27ae60; }
+        .trend.neutral { color: #f39c12; }
+
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .chart-container h3 {
+            color: #00d4aa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            height: 200px;
+            padding: 10px 0;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(to top, #00d4aa, #009EDB);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .bar.anomaly {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar-value {
+            font-size: 0.8em;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .bar-label {
+            font-size: 0.8em;
+            color: #a0c4c7;
+        }
+
+        /* Alert Panel */
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alert-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px 20px;
+            border-left: 4px solid;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .alert-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(5px);
+        }
+
+        .alert-item.critical { border-left-color: #e74c3c; }
+        .alert-item.high { border-left-color: #ff9800; }
+        .alert-item.medium { border-left-color: #f1c40f; }
+        .alert-item.low { border-left-color: #4caf50; }
+
+        .alert-info h4 {
+            color: #fff;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+
+        .alert-info p {
+            color: #a0c4c7;
+            font-size: 0.85em;
+        }
+
+        .alert-status {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-resolved { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+        .status-pending { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+        .status-assigned { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+
+        /* Report Issue Form */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #00d4aa;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(0, 212, 170, 0.3);
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95em;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #00d4aa;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d4aa, #009EDB);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
+        }
+
+        /* My Usage Panel */
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .usage-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .usage-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .usage-card .number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+
+        .usage-card .desc {
+            color: #a0c4c7;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(0, 158, 219, 0.1));
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            margin-top: 20px;
+        }
+
+        .tip-box h3 {
+            color: #00d4aa;
+            margin-bottom: 10px;
+        }
+
+        .tip-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tip-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #e0e0e0;
+        }
+
+        .tip-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00d4aa;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .chat-container { height: 500px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💧 AquaGuard AI</h1>
+            <p>Smart Water Stewardship Advisor for Educational Campuses</p>
+            <span class="sdg-badge">SDG 6: Clean Water & Sanitation</span>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPanel('chat')">💬 Chatbot</button>
+            <button class="nav-tab" onclick="showPanel('dashboard')">📊 Campus Stats</button>
+            <button class="nav-tab" onclick="showPanel('usage')">👤 My Usage</button>
+            <button class="nav-tab" onclick="showPanel('alerts')">⚠️ Alerts</button>
+            <button class="nav-tab" onclick="showPanel('report')">🚨 Report Issue</button>
+        </div>
+
+        <!-- Chatbot Panel -->
+        <div id="chat-panel" class="panel active">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-avatar">🤖</div>
+                    <div class="chat-header-info">
+                        <h3>AquaGuard AI Assistant</h3>
+                        <p>Powered by RAG + IBM Granite</p>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot">
+                        Hello! I'm AquaGuard AI, your campus water conservation assistant. 💧<br><br>
+                        I can help you with:<br>
+                        • Water policy questions<br>
+                        • Conservation tips<br>
+                        • Leak reporting guidance<br>
+                        • Usage statistics<br><br>
+                        What would you like to know?
+                    </div>
+                </div>
+                <div class="typing-indicator" id="typing">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="sendQuick('What is my daily water limit?')">Daily water limit</button>
+                    <button class="quick-btn" onclick="sendQuick('How to save water in hostel?')">Save water tips</button>
+                    <button class="quick-btn" onclick="sendQuick('Report a leak')">Report leak</button>
+                    <button class="quick-btn" onclick="sendQuick('Current campus usage')">Campus usage</button>
+                    <button class="quick-btn" onclick="sendQuick('SDG 6 information')">About SDG 6</button>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your question..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div id="dashboard-panel" class="panel">
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="label">Today's Consumption</div>
+                    <div class="value">148.2K L</div>
+                    <div class="trend up">▲ +2.2% vs predicted</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Active Alerts</div>
+                    <div class="value" style="color: #e74c3c;">2</div>
+                    <div class="trend up">1 HIGH, 1 MEDIUM</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Monthly Savings</div>
+                    <div class="value" style="color: #27ae60;">₹12,400</div>
+                    <div class="trend down">▼ 8% below budget</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label">Student Engagement</div>
+                    <div class="value" style="color: #f39c12;">78%</div>
+                    <div class="trend neutral">▲ +15% this week</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>📈 Weekly Consumption Trend (in 1000s Liters)</h3>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-value">42.5K</div>
+                        <div class="bar" style="height: 70%"></div>
+                        <div class="bar-label">Mon</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">44.2K</div>
+                        <div class="bar" style="height: 73%"></div>
+                        <div class="bar-label">Tue</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">38.1K</div>
+                        <div class="bar" style="height: 63%"></div>
+                        <div class="bar-label">Wed</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">52.0K</div>
+                        <div class="bar anomaly" style="height: 87%"></div>
+                        <div class="bar-label">Thu ⚠️</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">41.3K</div>
+                        <div class="bar" style="height: 68%"></div>
+                        <div class="bar-label">Fri</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">32.4K</div>
+                        <div class="bar" style="height: 54%"></div>
+                        <div class="bar-label">Sat</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">30.2K</div>
+                        <div class="bar" style="height: 50%"></div>
+                        <div class="bar-label">Sun</div>
+                    </div>
+                </div>
+                <p style="color: #e74c3c; font-size: 0.9em; margin-top: 10px;">⚠️ Thursday anomaly detected: Science Block (+162% above normal) — Leak alert sent to Maintenance Team A</p>
+            </div>
+
+            <div class="chart-container">
+                <h3>🏢 Consumption by Block (Yesterday)</h3>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-value">38.2K</div>
+                        <div class="bar" style="height: 60%; background: linear-gradient(to top, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Block A</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">45.8K</div>
+                        <div class="bar anomaly" style="height: 76%"></div>
+                        <div class="bar-label">Block B</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">41.5K</div>
+                        <div class="bar" style="height: 68%; background: linear-gradient(to top, #f39c12, #e67e22);"></div>
+                        <div class="bar-label">Block C</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">36.1K</div>
+                        <div class="bar" style="height: 58%; background: linear-gradient(to top, #27ae60, #2ecc71);"></div>
+                        <div class="bar-label">Block D</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-value">52.0K</div>
+                        <div class="bar anomaly" style="height: 87%"></div>
+                        <div class="bar-label">Science</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Usage Panel -->
+        <div id="usage-panel" class="panel">
+            <div class="usage-stats">
+                <div class="usage-card">
+                    <div class="icon">💧</div>
+                    <div class="number">135 L</div>
+                    <div class="desc">Daily Allocation</div>
+                </div>
+                <div class="usage-card">
+                    <div class="icon">📊</div>
+                    <div class="number" style="color: #e74c3c;">158 L</div>
+                    <div class="desc">Your Actual Usage</div>
+                </div>
+                <div class="usage-card">
+                    <div class="icon">⚠️</div>
+                    <div class="number" style="color: #e74c3c;">+17%</div>
+                    <div class="desc">Above Average</div>
+                </div>
+                <div class="usage-card">
+                    <div class="icon">🏆</div>
+                    <div class="number" style="color: #f39c12;">#42</div>
+                    <div class="desc">Rank in Block B</div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <h3>💡 Personalized Conservation Tips for You</h3>
+                <ul>
+                    <li>Your shower time averages 12 minutes — reducing to 8 minutes saves ~20L/day</li>
+                    <li>You use 35L for laundry — try running full loads only to save 15L per wash</li>
+                    <li>Your block has a reported leak on Floor 2 — report any new drips immediately</li>
+                    <li>AC condensate water (your block: ~50L/day) can be reused for corridor plants</li>
+                    <li>Peak usage in your block: 7-9 AM — consider showering at 6:30 AM to reduce congestion</li>
+                </ul>
+            </div>
+
+            <div class="tip-box" style="margin-top: 15px;">
+                <h3>🎯 This Week's Challenge</h3>
+                <p style="color: #e0e0e0; line-height: 1.6;">
+                    <strong>Goal:</strong> Reduce your daily usage to 140L for 5 consecutive days<br>
+                    <strong>Reward:</strong> 50 Eco-Points + Featured on Campus Sustainability Board<br>
+                    <strong>Progress:</strong> 2/5 days completed ✅✅⬜⬜⬜
+                </p>
+            </div>
+        </div>
+
+        <!-- Alerts Panel -->
+        <div id="alerts-panel" class="panel">
+            <div class="alert-list">
+                <div class="alert-item critical">
+                    <div class="alert-info">
+                        <h4>🔴 CRITICAL: Major Leak Detected</h4>
+                        <p>Science Block, Floor 2 | Consumption +162% above normal | Detected: 02:15 AM</p>
+                    </div>
+                    <span class="alert-status status-pending">PENDING</span>
+                </div>
+                <div class="alert-item high">
+                    <div class="alert-info">
+                        <h4>🟠 HIGH: Unusual Usage Pattern</h4>
+                        <p>Hostel Block B | +23% above baseline | Likely: Running tap in common area</p>
+                    </div>
+                    <span class="alert-status status-assigned">ASSIGNED</span>
+                </div>
+                <div class="alert-item medium">
+                    <div class="alert-info">
+                        <h4>🟡 MEDIUM: Slow Drip Reported</h4>
+                        <p>Canteen Area | Estimated 15L/day loss | Reported by student</p>
+                    </div>
+                    <span class="alert-status status-assigned">ASSIGNED</span>
+                </div>
+                <div class="alert-item low">
+                    <div class="alert-info">
+                        <h4>🟢 LOW: Maintenance Scheduled</h4>
+                        <p>Block A, Floor 3 | Routine valve check | Tomorrow 10:00 AM</p>
+                    </div>
+                    <span class="alert-status status-resolved">RESOLVED</span>
+                </div>
+                <div class="alert-item low">
+                    <div class="alert-info">
+                        <h4>🟢 LOW: Sensor Calibration</h4>
+                        <p>Block D meter | Accuracy check | Completed today</p>
+                    </div>
+                    <span class="alert-status status-resolved">RESOLVED</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Issue Panel -->
+        <div id="report-panel" class="panel">
+            <div class="form-container">
+                <h2 style="color: #00d4aa; margin-bottom: 20px; text-align: center;">🚨 Report a Water Issue</h2>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Hostel/Block</label>
+                    <select>
+                        <option>Select your block</option>
+                        <option>Block A</option>
+                        <option>Block B</option>
+                        <option>Block C</option>
+                        <option>Block D</option>
+                        <option>Science Block</option>
+                        <option>Canteen</option>
+                        <option>Library</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Floor/Room (Optional)</label>
+                    <input type="text" placeholder="e.g., Floor 2, Room 204">
+                </div>
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    <select>
+                        <option>Select issue type</option>
+                        <option>Leaking tap/faucet</option>
+                        <option>Running toilet</option>
+                        <option>Pipe burst</option>
+                        <option>Water supply shortage</option>
+                        <option>Water quality issue</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Severity</label>
+                    <select>
+                        <option>Select severity</option>
+                        <option>Low - Minor drip, not urgent</option>
+                        <option>Medium - Steady leak, needs attention</option>
+                        <option>High - Major leak, water pooling</option>
+                        <option>Critical - Pipe burst, flooding</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea placeholder="Describe the issue in detail... Where exactly is the leak? How long has it been happening?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload Photo (Optional)</label>
+                    <input type="file" accept="image/*" style="padding: 10px;">
+                </div>
+                <button class="submit-btn" onclick="submitReport()">📤 Submit Report</button>
+                <p id="report-status" style="text-align: center; margin-top: 15px; color: #00d4aa; display: none;">
+                    ✅ Report submitted! Ticket #H2O-2026-0614-0089 created. Maintenance team notified.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function showPanel(panelName) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(panelName + '-panel').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Chat functionality
+        const knowledgeBase = {
+            'water limit': {
+                answer: `According to the College Hostel Manual (2025), each student is allocated <strong>135 liters per day</strong>. This includes drinking, bathing, laundry, and sanitation.<br><br>Currently, your block (Block B) averages <strong>158 liters/day per student</strong> — that's <span style="color: #e74c3c;">17% over-consumption</span>.<br><br>💡 <strong>Tip:</strong> Reducing shower time by just 2 minutes saves ~15 liters per shower!`,
+                source: 'Source: Hostel Water Policy, Page 12'
+            },
+            'save water': {
+                answer: `Here are <strong>5 proven ways</strong> to save water in your hostel:<br><br>
+                1. 🚿 <strong>Shorter Showers:</strong> 8 min instead of 12 min → Save 20L/day<br>
+                2. 🪣 <strong>Full Laundry Loads:</strong> Only run when full → Save 15L/wash<br>
+                3. 🚰 <strong>Fix Leaks Fast:</strong> A dripping tap wastes 15L/day<br>
+                4. ♻️ <strong>Reuse Water:</strong> AC condensate for plants → Save 50L/day (block level)<br>
+                5. ⏰ <strong>Off-Peak Usage:</strong> Shower at 6:30 AM instead of 8 AM → Less waste<br><br>
+                🎯 <strong>Challenge:</strong> Try these for 5 days and earn 50 Eco-Points!`,
+                source: 'Source: UNEP Water Conservation Guidelines, Section 4.2'
+            },
+            'report leak': {
+                answer: `I'll help you report a leak! Here are your options:<br><br>
+                <strong>Fastest way:</strong> Use the <strong>"Report Issue"</strong> tab above — upload a photo and auto-location.<br><br>
+                <strong>Other options:</strong><br>
+                • Maintenance Office: <strong>Ext. 4521</strong><br>
+                • WhatsApp: <strong>+91-98765-43210</strong><br>
+                • Email: <strong>maintenance@college.edu</strong><br><br>
+                <strong>Emergency (after 6 PM):</strong> Security <strong>Ext. 100</strong><br><br>
+                ⏱️ Average response time: <strong>4 hours</strong>`,
+                source: 'Source: Campus Maintenance Protocol 2025',
+                action: 'Click "Report Issue" tab to file a report now!'
+            },
+            'campus usage': {
+                answer: `📊 <strong>Today's Campus Water Usage:</strong><br><br>
+                • <strong>Total:</strong> 148,200 liters<br>
+                • <strong>Predicted:</strong> 145,000 liters<br>
+                • <strong>Variance:</strong> <span style="color: #e74c3c;">+2.2% above predicted</span><br><br>
+                <strong>Top Consumers:</strong><br>
+                1. Science Block: 52,000L ⚠️ (ANOMALY)<br>
+                2. Block B: 45,800L<br>
+                3. Block C: 41,500L<br>
+                4. Block A: 38,200L<br>
+                5. Block D: 36,100L<br><br>
+                🔴 <strong>Alert:</strong> Science Block showing +162% above normal — leak investigation in progress.`,
+                source: 'Source: AquaGuard AI Real-Time Monitoring System'
+            },
+            'sdg 6': {
+                answer: `<strong>SDG 6: Clean Water and Sanitation</strong> 🌍<br><br>
+                "Ensure availability and sustainable management of water and sanitation for all."<br><br>
+                <strong>Key Targets:</strong><br>
+                • 6.4: Increase water-use efficiency<br>
+                • 6.5: Integrated water resources management<br>
+                • 6.6: Protect water-related ecosystems<br>
+                • 6.b: Support local communities<br><br>
+                <strong>How AquaGuard AI contributes:</strong><br>
+                ✅ Reduces campus water waste by 15%<br>
+                ✅ Educates students on conservation<br>
+                ✅ Detects leaks proactively<br>
+                ✅ Generates SDG 6 compliance reports<br><br>
+                🌱 <em>Every drop saved is a step toward SDG 6!</em>`,
+                source: 'Source: UN Sustainable Development Goals Official Documentation'
+            },
+            'leak': {
+                answer: `I can help with leak-related issues! Here's what you can do:<br><br>
+                <strong>If you see a leak:</strong><br>
+                1. 📸 Take a photo<br>
+                2. 📍 Note the exact location<br>
+                3. 🚨 Use the "Report Issue" tab to file a report<br>
+                4. 📞 Or call Maintenance: Ext. 4521<br><br>
+                <strong>Current Active Leaks:</strong><br>
+                🔴 Science Block F2 — CRITICAL (under repair)<br>
+                🟠 Block B Common Area — HIGH (team assigned)<br>
+                🟡 Canteen — MEDIUM (scheduled for today)<br><br>
+                ⏱️ Your report will be processed within <strong>4 hours</strong>.`,
+                source: 'Source: AquaGuard AI Alert System'
+            },
+            'hello': {
+                answer: `Hello! 👋 Welcome to AquaGuard AI!<br><br>
+                I'm your smart water conservation assistant. I can help you with:<br>
+                💧 Water policy questions<br>
+                📊 Campus usage statistics<br>
+                💡 Conservation tips<br>
+                🚨 Leak reporting<br>
+                🌍 SDG 6 information<br><br>
+                What would you like to know today?`,
+                source: ''
+            },
+            'default': {
+                answer: `I understand you're asking about "<strong>{query}</strong>". While I don't have specific information about this in my current knowledge base, here's some general water conservation advice:<br><br>
+                💧 <strong>General Tips:</strong><br>
+                • Turn off taps while brushing teeth (saves 6L/min)<br>
+                • Fix leaks immediately (a drip = 15L/day)<br>
+                • Use a bucket instead of running water<br>
+                • Report any water wastage you see<br><br>
+                📚 For specific policies, check the Hostel Manual or contact the Maintenance Office (Ext. 4521).<br><br>
+                Is there something else I can help you with?`,
+                source: 'Source: General Water Conservation Guidelines'
+            }
+        };
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        function sendQuick(text) {
+            document.getElementById('chat-input').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            document.getElementById('typing').style.display = 'flex';
+
+            // Simulate AI response delay
+            setTimeout(() => {
+                document.getElementById('typing').style.display = 'none';
+                const response = generateResponse(message);
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(text, type) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function generateResponse(query) {
+            const lowerQuery = query.toLowerCase();
+            let response = knowledgeBase.default;
+
+            for (const key in knowledgeBase) {
+                if (lowerQuery.includes(key)) {
+                    response = knowledgeBase[key];
+                    break;
+                }
+            }
+
+            let html = response.answer;
+            if (response.source) {
+                html += `<div class="source">${response.source}</div>`;
+            }
+            if (response.action) {
+                html += `<br><span class="action-btn" onclick="showPanel('report')">${response.action}</span>`;
+            }
+
+            return html.replace('{query}', query);
+        }
+
+        function submitReport() {
+            const btn = document.querySelector('.submit-btn');
+            btn.textContent = '⏳ Submitting...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = '✅ Submitted!';
+                btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+                document.getElementById('report-status').style.display = 'block';
+
+                setTimeout(() => {
+                    btn.textContent = '📤 Submit Report';
+                    btn.style.background = 'linear-gradient(135deg, #00d4aa, #009EDB)';
+                    btn.disabled = false;
+                }, 3000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
